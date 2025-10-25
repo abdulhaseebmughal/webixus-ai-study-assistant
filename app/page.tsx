@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen, Brain, Lightbulb, MessageSquare, Zap, BarChart3 } from "lucide-react"
 import Link from "next/link"
+import { Navigation } from "@/components/navigation"
 
 export default function Home() {
   const [activeFeature, setActiveFeature] = useState<string | null>(null)
@@ -55,27 +56,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg">StudyAI</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition">
-              Features
-            </a>
-            <a href="#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition">
-              How it Works
-            </a>
-            <Button variant="default" size="sm">
-              Get Started
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
@@ -86,12 +67,16 @@ export default function Home() {
             personalizes your study experience.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
-              Start Learning Now
-            </Button>
-            <Button size="lg" variant="outline">
-              Watch Demo
-            </Button>
+            <Link href="/summarizer">
+              <Button size="lg" className="bg-primary hover:bg-primary/90 w-full sm:w-auto">
+                Start Learning Now
+              </Button>
+            </Link>
+            <Link href="#features">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                Explore Features
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -170,9 +155,11 @@ export default function Home() {
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
             Join thousands of students and researchers who are learning smarter with AI-powered study tools.
           </p>
-          <Button size="lg" className="bg-primary hover:bg-primary/90">
-            Get Started Free
-          </Button>
+          <Link href="/dashboard">
+            <Button size="lg" className="bg-primary hover:bg-primary/90">
+              Get Started Free
+            </Button>
+          </Link>
         </div>
       </section>
 
