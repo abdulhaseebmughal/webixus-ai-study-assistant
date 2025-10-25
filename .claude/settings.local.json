@@ -12,7 +12,8 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: AI-Powered Study Assistant\n\n- Complete Next.js 16 application with Tailwind CSS\n- Features: Summarizer, Quiz Generator, Flashcards, Dashboard, Study Buddy\n- All dependencies installed and build successful\n- TypeScript configured\n- Ready for production deployment\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(node test-api.js:*)"
     ],
     "deny": [],
     "ask": []

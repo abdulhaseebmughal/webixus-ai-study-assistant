@@ -29,7 +29,7 @@ export async function callDOAI(
   } = {}
 ): Promise<AIResponse> {
   const {
-    model = "llama3-70b-instruct",
+    model = "llama3.3-70b-instruct",
     maxTokens = 2000,
     temperature = 0.7,
   } = options;
