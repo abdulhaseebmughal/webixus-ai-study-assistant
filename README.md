@@ -26,7 +26,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env.local
-# Edit .env.local with your MongoDB URI, DigitalOcean API key, and JWT secret
+# Edit .env.local with your credentials (or use .env.example as-is for quick testing)
 
 # Run the development server
 npm run dev
@@ -36,23 +36,66 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 ### Environment Variables
 
-Create a `.env.local` file in the root directory with the following variables:
+The `.env.example` file contains all required variables with working values. Just copy it:
+
+```bash
+cp .env.example .env.local
+```
+
+Or manually create `.env.local`:
 
 ```env
 # MongoDB Connection
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database-name
+MONGODB_URI=mongodb+srv://ai-powered-student-assistant:ai-powered-student-assistant123@ai-powered-student-assi.n7vsuvh.mongodb.net/study-assistant?retryWrites=true&w=majority
 
 # DigitalOcean AI API
-DO_API_KEY=your-digitalocean-api-key
-DO_API_URL=https://api.digitalocean.com/v2/ai/inference
+DO_API_KEY=sk-do-5DcnQeCkDgCRWy_LyixR9JkRyiY3NGJfAAFGmsxrl9C1p6AEHatSuSx5i2
 
-# JWT Secret (Generate a secure random string)
-JWT_SECRET=your-super-secret-jwt-key-min-32-characters
+# JWT Secret
+JWT_SECRET=webixus-ai-study-assistant-super-secret-jwt-key-production-2025-hackathon-secure
 
 # App Configuration
-NODE_ENV=development
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NODE_ENV=production
+NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
 ```
+
+## 🚀 Deploy to Vercel
+
+### One-Click Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/abdulhaseebmughal/webixus-ai-study-assistant)
+
+### Manual Deployment
+
+1. **Push to GitHub** (already done!)
+
+2. **Import to Vercel:**
+   - Go to https://vercel.com/new
+   - Import your GitHub repository
+   - Click "Deploy"
+
+3. **Add Environment Variables in Vercel:**
+   - Go to: Settings → Environment Variables
+   - Add these 5 variables (copy from `.env.example`):
+
+   | Key | Value |
+   |-----|-------|
+   | `MONGODB_URI` | `mongodb+srv://ai-powered-student-assistant:ai-powered-student-assistant123@ai-powered-student-assi.n7vsuvh.mongodb.net/study-assistant?retryWrites=true&w=majority` |
+   | `DO_API_KEY` | `sk-do-5DcnQeCkDgCRWy_LyixR9JkRyiY3NGJfAAFGmsxrl9C1p6AEHatSuSx5i2` |
+   | `JWT_SECRET` | `webixus-ai-study-assistant-super-secret-jwt-key-production-2025-hackathon-secure` |
+   | `NODE_ENV` | `production` |
+   | `NEXT_PUBLIC_APP_URL` | `https://your-vercel-url.vercel.app` |
+
+4. **Redeploy:**
+   - After adding variables, go to Deployments tab
+   - Click "Redeploy" on latest deployment
+   - ✅ Your app is live!
+
+### Important Notes:
+- Select **All Environments** (Production, Preview, Development) when adding variables
+- Update `NEXT_PUBLIC_APP_URL` with your actual Vercel URL after first deployment
+- Build time: ~30-60 seconds
+- All AI features work out of the box!
 
 ## Tech Stack
 
