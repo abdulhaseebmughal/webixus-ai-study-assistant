@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { FeatureLayout } from "@/components/feature-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -19,34 +20,48 @@ import {
   Pie,
   Cell,
 } from "recharts"
-import { Target, Zap, Brain, AlertCircle } from "lucide-react"
+import { Target, Zap, Brain, AlertCircle, Loader2 } from "lucide-react"
 
 export default function DashboardPage() {
-  // Mock data
-  const studyStats = {
-    totalHours: 24.5,
-    sessionsCompleted: 18,
-    averageScore: 82,
-    streak: 7,
+  const [loading, setLoading] = useState(true)
+  const [studyStats, setStudyStats] = useState({
+    totalHours: 0,
+    sessionsCompleted: 0,
+    averageScore: 0,
+    streak: 0,
+  })
+
+  useEffect(() => {
+    fetchProgress()
+  }, [])
+
+  const fetchProgress = async () => {
+    try {
+      const token = localStorage.getItem("token")
+
+      const response = await fetch("/api/progress", {
+        headers: {
+          "Authorization": token ? `Bearer ${token}` : "",
+        },
+      })
+
+      const data = await response.json()
+
+      if (data.success && data.data.progress) {
+        const progress = data.data.progress
+        setStudyStats({
+          totalHours: progress.totalStudyHours || 0,
+          sessionsCompleted: progress.sessionsCompleted || 0,
+          averageScore: progress.averageScore || 0,
+          streak: progress.streak || 0,
+        })
+      }
+    } catch (error) {
+      console.error("Failed to fetch progress:", error)
+    } finally {
+      setLoading(false)
+    }
   }
-
-  const weeklyProgress = [
-    { day: "Mon", hours: 2.5, quizzes: 3 },
-    { day: "Tue", hours: 3.2, quizzes: 4 },
-    { day: "Wed", hours: 1.8, quizzes: 2 },
-    { day: "Thu", hours: 4.1, quizzes: 5 },
-    { day: "Fri", hours: 2.9, quizzes: 3 },
-    { day: "Sat", hours: 3.5, quizzes: 4 },
-    { day: "Sun", hours: 3.0, quizzes: 3 },
-  ]
-
-  const subjectPerformance = [
-    { subject: "Transformers", score: 92, target: 85 },
-    { subject: "NLP", score: 78, target: 85 },
-    { subject: "Deep Learning", score: 88, target: 85 },
-    { subject: "Python", score: 95, target: 85 },
-    { subject: "Statistics", score: 72, target: 85 },
-  ]
 
   const learningBreakdown = [
     { name: "Quizzes", value: 35, color: "#8b5cf6" },
@@ -55,28 +70,22 @@ export default function DashboardPage() {
     { name: "Study Buddy", value: 15, color: "#10b981" },
   ]
 
-  const weakAreas = [
-    { subject: "Statistics", score: 72, recommendation: "Review probability concepts and practice more problems" },
-    { subject: "NLP", score: 78, recommendation: "Focus on sequence-to-sequence models and attention mechanisms" },
-    { subject: "Data Preprocessing", score: 75, recommendation: "Practice data cleaning and normalization techniques" },
-  ]
-
   const recommendations = [
     {
-      title: "Master Statistics",
-      description: "Your weakest area. Complete 5 more quizzes on probability theory.",
+      title: "Keep Learning",
+      description: "Continue your study streak by completing quizzes and flashcards daily.",
       priority: "high",
       icon: AlertCircle,
     },
     {
-      title: "Maintain Python Streak",
-      description: "You're doing great! Keep practicing daily to maintain your 7-day streak.",
+      title: "Practice Regularly",
+      description: "Consistent practice leads to better retention and understanding.",
       priority: "medium",
       icon: Zap,
     },
     {
-      title: "Review NLP Concepts",
-      description: "Revisit sequence models. Create new flashcards for better retention.",
+      title: "Review Progress",
+      description: "Check your weak areas and focus on improving them.",
       priority: "medium",
       icon: Brain,
     },
@@ -129,112 +138,31 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts */}
-        <Tabs defaultValue="progress" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="progress">Weekly Progress</TabsTrigger>
-            <TabsTrigger value="performance">Subject Performance</TabsTrigger>
-            <TabsTrigger value="breakdown">Learning Breakdown</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="progress">
-            <Card>
-              <CardHeader>
-                <CardTitle>Weekly Study Activity</CardTitle>
-                <CardDescription>Hours studied and quizzes completed per day</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={weeklyProgress}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="hours" stroke="#8b5cf6" name="Study Hours" />
-                    <Line type="monotone" dataKey="quizzes" stroke="#06b6d4" name="Quizzes" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="performance">
-            <Card>
-              <CardHeader>
-                <CardTitle>Subject Performance vs Target</CardTitle>
-                <CardDescription>Your scores compared to your learning goals</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={subjectPerformance}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="subject" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="score" fill="#8b5cf6" name="Your Score" />
-                    <Bar dataKey="target" fill="#d1d5db" name="Target" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="breakdown">
-            <Card>
-              <CardHeader>
-                <CardTitle>Learning Method Distribution</CardTitle>
-                <CardDescription>Time spent on each learning tool</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={learningBreakdown}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {learningBreakdown.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Weak Areas */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-600" />
-              Areas for Improvement
-            </CardTitle>
-            <CardDescription>Topics where you scored below your target</CardDescription>
+            <CardTitle>Learning Method Distribution</CardTitle>
+            <CardDescription>Your activity across different study tools</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {weakAreas.map((area, idx) => (
-                <div key={idx} className="p-4 border border-border rounded-lg">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h4 className="font-semibold">{area.subject}</h4>
-                      <p className="text-sm text-muted-foreground">Current score: {area.score}%</p>
-                    </div>
-                    <span className="text-sm font-medium text-amber-600">Below target</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{area.recommendation}</p>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={learningBreakdown}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, value }) => `${name}: ${value}%`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {learningBreakdown.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 

@@ -36,35 +36,39 @@ export default function SummarizerPage() {
 
     setLoading(true)
     try {
-      // Simulate API call - in production, this would call your AI backend
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const token = localStorage.getItem("token")
 
-      // Mock response
+      const response = await fetch("/api/summarize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ text: input }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to summarize")
+      }
+
       setSummary({
-        tldr: "This research explores advanced machine learning techniques for natural language processing, demonstrating significant improvements in model accuracy and efficiency through novel architectural innovations.",
-        detailed:
-          "The paper presents a comprehensive study of transformer-based architectures applied to NLP tasks. The authors introduce a new attention mechanism that reduces computational complexity while maintaining or improving accuracy. Their methodology involves training on multiple datasets and comparing against state-of-the-art baselines. Results show a 15% improvement in processing speed and 8% improvement in accuracy metrics.",
-        keyPoints: [
-          "Novel attention mechanism reduces computational complexity",
-          "15% improvement in processing speed achieved",
-          "8% improvement in accuracy metrics",
-          "Tested on multiple benchmark datasets",
-          "Scalable to larger models and datasets",
-        ],
-        methodology:
-          "The research employed a comparative analysis approach, training transformer models with the proposed attention mechanism on standard NLP benchmarks including GLUE and SuperGLUE. The team used cross-validation techniques and statistical significance testing to validate results.",
-        conclusions:
-          "The proposed attention mechanism offers a promising direction for efficient NLP models. Future work should explore applications to other domains and investigate further optimizations for edge deployment.",
+        tldr: data.data.summary.tldr,
+        detailed: data.data.summary.detailed,
+        keyPoints: data.data.summary.keyPoints,
+        methodology: "",
+        conclusions: "",
       })
 
       toast({
         title: "Success",
         description: "Content summarized successfully",
       })
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to summarize content",
+        description: error.message || "Failed to summarize content",
         variant: "destructive",
       })
     } finally {

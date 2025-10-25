@@ -44,65 +44,37 @@ export default function QuizPage() {
 
     setLoading(true)
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const token = localStorage.getItem("token")
 
-      // Mock quiz questions
-      const mockQuestions: QuizQuestion[] = [
-        {
-          id: "q1",
-          question: "What is the primary advantage of transformer architectures in NLP?",
-          type: "multiple-choice",
-          options: [
-            "They process sequences sequentially",
-            "They use parallel processing with attention mechanisms",
-            "They require less memory than RNNs",
-            "They are easier to implement",
-          ],
-          correctAnswer: "They use parallel processing with attention mechanisms",
-          explanation:
-            "Transformers use self-attention mechanisms that allow parallel processing of sequences, making them much faster than sequential models like RNNs.",
+      const response = await fetch("/api/quizzes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
         },
-        {
-          id: "q2",
-          question: "Explain how the attention mechanism works in transformers.",
-          type: "short-answer",
-          correctAnswer:
-            "The attention mechanism computes weighted sums of values based on query-key similarities, allowing the model to focus on relevant parts of the input.",
-          explanation:
-            "The attention mechanism calculates attention weights by comparing queries with keys, then uses these weights to create a weighted sum of values. This allows the model to dynamically focus on different parts of the input.",
-        },
-        {
-          id: "q3",
-          question: "Which of the following is NOT a component of the transformer architecture?",
-          type: "multiple-choice",
-          options: ["Multi-head attention", "Feed-forward networks", "Recurrent connections", "Positional encoding"],
-          correctAnswer: "Recurrent connections",
-          explanation:
-            "Transformers do not use recurrent connections. They rely entirely on attention mechanisms and feed-forward networks, which is why they can process sequences in parallel.",
-        },
-        {
-          id: "q4",
-          question: "What is the purpose of positional encoding in transformers?",
-          type: "short-answer",
-          correctAnswer:
-            "Positional encoding provides information about the position of tokens in the sequence, since transformers process all tokens in parallel.",
-          explanation:
-            "Since transformers process all tokens simultaneously (unlike RNNs), they need positional encoding to understand the order of tokens in the sequence.",
-        },
-        {
-          id: "q5",
-          question: "How many attention heads are typically used in modern transformer models?",
-          type: "multiple-choice",
-          options: ["2-4 heads", "8-16 heads", "32-64 heads", "128+ heads"],
-          correctAnswer: "8-16 heads",
-          explanation:
-            "Most modern transformers like BERT and GPT use 8-16 attention heads. This allows the model to attend to different representation subspaces simultaneously.",
-        },
-      ]
+        body: JSON.stringify({
+          text: input,
+          questionCount: 5
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to generate quiz")
+      }
+
+      const questions = data.data.quiz.questions.map((q: any, index: number) => ({
+        id: `q${index + 1}`,
+        question: q.question,
+        type: q.options ? "multiple-choice" : "short-answer",
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+      }))
 
       setQuiz({
-        questions: mockQuestions,
+        questions,
         currentIndex: 0,
         answers: {},
         submitted: false,
@@ -112,10 +84,10 @@ export default function QuizPage() {
         title: "Success",
         description: "Quiz generated successfully",
       })
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to generate quiz",
+        description: error.message || "Failed to generate quiz",
         variant: "destructive",
       })
     } finally {

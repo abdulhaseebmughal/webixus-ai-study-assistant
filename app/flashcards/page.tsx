@@ -47,81 +47,54 @@ export default function FlashcardsPage() {
 
     setLoading(true)
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const token = localStorage.getItem("token")
 
-      // Mock flashcards
-      const mockCards: Flashcard[] = [
-        {
-          id: "fc1",
-          front: "What is a transformer?",
-          back: "A transformer is a deep learning architecture based on self-attention mechanisms that processes sequences in parallel, enabling efficient training on large datasets.",
-          status: "new",
+      const response = await fetch("/api/flashcards", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token ? `Bearer ${token}` : "",
         },
-        {
-          id: "fc2",
-          front: "What is self-attention?",
-          back: "Self-attention is a mechanism that allows each token in a sequence to attend to all other tokens, computing weighted sums based on query-key-value interactions.",
-          status: "new",
-        },
-        {
-          id: "fc3",
-          front: "What are attention heads?",
-          back: "Attention heads are parallel attention mechanisms that allow the model to attend to different representation subspaces simultaneously, improving model expressiveness.",
-          status: "new",
-        },
-        {
-          id: "fc4",
-          front: "What is positional encoding?",
-          back: "Positional encoding adds information about token positions to embeddings, allowing transformers to understand sequence order despite processing all tokens in parallel.",
-          status: "new",
-        },
-        {
-          id: "fc5",
-          front: "What is the feed-forward network in transformers?",
-          back: "The feed-forward network is a two-layer fully connected network applied to each token independently, consisting of a hidden layer with ReLU activation.",
-          status: "new",
-        },
-        {
-          id: "fc6",
-          front: "What is layer normalization?",
-          back: "Layer normalization normalizes activations across features for each sample independently, helping stabilize training and improve model performance.",
-          status: "new",
-        },
-        {
-          id: "fc7",
-          front: "What is the difference between encoder and decoder?",
-          back: "Encoders process the full input sequence with bidirectional attention, while decoders process sequences autoregressively with causal masking to prevent attending to future tokens.",
-          status: "new",
-        },
-        {
-          id: "fc8",
-          front: "What is causal masking?",
-          back: "Causal masking prevents tokens from attending to future tokens during generation, ensuring the model generates sequences one token at a time.",
-          status: "new",
-        },
-      ]
+        body: JSON.stringify({
+          text: input,
+          title: topic,
+          cardCount: 8
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to generate flashcards")
+      }
+
+      const cards = data.data.deck.cards.map((c: any, index: number) => ({
+        id: `fc${index + 1}`,
+        front: c.front,
+        back: c.back,
+        status: c.status || "new",
+      }))
 
       setDeck({
-        cards: mockCards,
+        cards,
         currentIndex: 0,
         isFlipped: false,
         shuffled: false,
         stats: {
           learned: 0,
           learning: 0,
-          new: mockCards.length,
+          new: cards.length,
         },
       })
 
       toast({
         title: "Success",
-        description: `Created ${mockCards.length} flashcards`,
+        description: `Created ${cards.length} flashcards`,
       })
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to generate flashcards",
+        description: error.message || "Failed to generate flashcards",
         variant: "destructive",
       })
     } finally {
