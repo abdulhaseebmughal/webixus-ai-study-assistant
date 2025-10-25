@@ -4,7 +4,7 @@
  */
 
 const DO_API_KEY = process.env.DO_API_KEY!;
-const DO_API_ENDPOINT = "https://api.digitalocean.com/v2/genai/chat/completions";
+const DO_API_ENDPOINT = "https://inference.do-ai.run/v1/chat/completions";
 
 if (!DO_API_KEY) {
   throw new Error("Please define DO_API_KEY in .env.local");
@@ -29,7 +29,7 @@ export async function callDOAI(
   } = {}
 ): Promise<AIResponse> {
   const {
-    model = "meta-llama/llama-3.1-70b-instruct",
+    model = "llama3-70b-instruct",
     maxTokens = 2000,
     temperature = 0.7,
   } = options;
