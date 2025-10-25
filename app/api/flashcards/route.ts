@@ -12,7 +12,6 @@ import { generateFlashcards } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = requireAuth(request);
     await connectDB();
 
     const body = await request.json();
@@ -25,7 +24,6 @@ export async function POST(request: NextRequest) {
     if (documentId) {
       const document = await DocumentModel.findOne({
         _id: documentId,
-        userId: authUser.userId,
       });
 
       if (!document) {
@@ -73,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     // Create flashcard deck in database
     const flashcardDeck = await Flashcard.create({
-      userId: authUser.userId,
+      userId: "demo-user",
       documentId: documentId || undefined,
       title: deckTitle,
       cards: cardsWithStatus,
@@ -98,16 +96,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Generate flashcards error:", error);
     return NextResponse.json(
       {
@@ -122,12 +110,11 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authUser = requireAuth(request);
     await connectDB();
 
-    const flashcards = await Flashcard.find({ userId: authUser.userId }).sort({
+    const flashcards = await Flashcard.find({}).sort({
       createdAt: -1,
-    });
+    }).limit(10);
 
     return NextResponse.json(
       {
@@ -146,16 +133,6 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Get flashcards error:", error);
     return NextResponse.json(
       {

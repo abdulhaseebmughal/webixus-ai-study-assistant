@@ -14,7 +14,6 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authUser = requireAuth(request);
     await connectDB();
 
     const body = await request.json();
@@ -42,7 +41,6 @@ export async function PATCH(
 
     const deck = await Flashcard.findOne({
       _id: params.id,
-      userId: authUser.userId,
     });
 
     if (!deck) {
@@ -81,10 +79,11 @@ export async function PATCH(
 
     // Update user progress
     await Progress.findOneAndUpdate(
-      { userId: authUser.userId },
+      { userId: "demo-user" },
       {
         $inc: { flashcardsReviewed: 1 },
-      }
+      },
+      { upsert: true }
     );
 
     return NextResponse.json(
@@ -100,16 +99,6 @@ export async function PATCH(
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Update flashcard error:", error);
     return NextResponse.json(
       {

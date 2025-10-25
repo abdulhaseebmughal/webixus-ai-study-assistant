@@ -47,13 +47,10 @@ export default function FlashcardsPage() {
 
     setLoading(true)
     try {
-      const token = localStorage.getItem("token")
-
       const response = await fetch("/api/flashcards", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({
           text: input,

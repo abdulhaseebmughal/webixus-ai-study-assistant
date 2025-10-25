@@ -11,7 +11,6 @@ import { generateSummary } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = requireAuth(request);
     await connectDB();
 
     const body = await request.json();
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
     if (documentId) {
       const document = await DocumentModel.findOne({
         _id: documentId,
-        userId: authUser.userId,
       });
 
       if (!document) {
@@ -74,16 +72,6 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Summarize error:", error);
     return NextResponse.json(
       {

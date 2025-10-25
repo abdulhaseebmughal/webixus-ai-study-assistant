@@ -37,13 +37,7 @@ export default function DashboardPage() {
 
   const fetchProgress = async () => {
     try {
-      const token = localStorage.getItem("token")
-
-      const response = await fetch("/api/progress", {
-        headers: {
-          "Authorization": token ? `Bearer ${token}` : "",
-        },
-      })
+      const response = await fetch("/api/progress")
 
       const data = await response.json()
 

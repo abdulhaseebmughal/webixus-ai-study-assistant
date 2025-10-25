@@ -9,8 +9,6 @@ import { chatWithAI } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = requireAuth(request);
-
     const body = await request.json();
     const { question, context } = body;
 
@@ -39,16 +37,6 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Chat error:", error);
     return NextResponse.json(
       {

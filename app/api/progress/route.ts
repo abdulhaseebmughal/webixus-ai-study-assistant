@@ -10,15 +10,14 @@ import { requireAuth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
-    const authUser = requireAuth(request);
     await connectDB();
 
-    let progress = await Progress.findOne({ userId: authUser.userId });
+    let progress = await Progress.findOne({ userId: "demo-user" });
 
     // Create progress if doesn't exist
     if (!progress) {
       progress = await Progress.create({
-        userId: authUser.userId,
+        userId: "demo-user",
       });
     }
 
@@ -68,16 +67,6 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Get progress error:", error);
     return NextResponse.json(
       {

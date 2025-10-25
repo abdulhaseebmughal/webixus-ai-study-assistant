@@ -13,7 +13,6 @@ import { generateQuiz } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
-    const authUser = requireAuth(request);
     await connectDB();
 
     const body = await request.json();
@@ -26,7 +25,6 @@ export async function POST(request: NextRequest) {
     if (documentId) {
       const document = await DocumentModel.findOne({
         _id: documentId,
-        userId: authUser.userId,
       });
 
       if (!document) {
@@ -68,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Create quiz in database
     const quiz = await Quiz.create({
-      userId: authUser.userId,
+      userId: "demo-user",
       documentId: documentId || undefined,
       title: quizTitle,
       questions,
@@ -93,16 +91,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Generate quiz error:", error);
     return NextResponse.json(
       {
@@ -117,12 +105,11 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const authUser = requireAuth(request);
     await connectDB();
 
-    const quizzes = await Quiz.find({ userId: authUser.userId }).sort({
+    const quizzes = await Quiz.find({}).sort({
       createdAt: -1,
-    });
+    }).limit(10);
 
     return NextResponse.json(
       {
@@ -143,16 +130,6 @@ export async function GET(request: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized - Please login",
-        },
-        { status: 401 }
-      );
-    }
-
     console.error("Get quizzes error:", error);
     return NextResponse.json(
       {

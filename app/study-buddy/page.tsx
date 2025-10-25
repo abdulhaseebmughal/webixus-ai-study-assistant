@@ -57,13 +57,10 @@ export default function StudyBuddyPage() {
     setLoading(true)
 
     try {
-      const token = localStorage.getItem("token")
-
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({
           question: userQuestion,
