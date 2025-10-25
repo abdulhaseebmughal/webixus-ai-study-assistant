@@ -1,30 +1,93 @@
-# AI Study Assistant
+# AI-Powered Study Assistant - WebixusAI
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+Your AI-powered study companion that simplifies complex knowledge, boosts learning efficiency, and personalizes your study experience.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/muhammadsufiyanbaigs-projects/v0-ai-study-assistant)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/3WVd6Ckc104)
+## Features
 
-## Overview
+- **Research Paper Summarizer** - Upload or paste academic papers and get instant summaries with key points and conclusions
+- **Smart Quiz Generator** - Create multiple-choice and short-answer quizzes with instant feedback
+- **Flashcard Creator** - Convert topics into interactive flashcards for active recall practice
+- **Learning Dashboard** - Track your progress, identify weak areas, and get personalized recommendations
+- **Study Buddy Chat** - Get conversational Q&A support and explanations for difficult concepts
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+## Quick Start
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/abdulhaseebmughal/webixus-ai-study-assistant.git
+
+# Navigate to the project directory
+cd webixus-ai-study-assistant
+
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (with Turbopack)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS 4
+- **UI Components:** Radix UI + shadcn/ui
+- **Charts:** Recharts
+- **Icons:** Lucide React
+
+## Available Scripts
+
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm start` - Start production server
+- `npm run lint` - Run ESLint
+
+## Project Structure
+
+```
+├── app/                    # Next.js app directory
+│   ├── page.tsx           # Home page
+│   ├── layout.tsx         # Root layout
+│   ├── dashboard/         # Dashboard page
+│   ├── flashcards/        # Flashcards feature
+│   ├── quiz/              # Quiz generator
+│   ├── study-buddy/       # Study buddy chat
+│   └── summarizer/        # Paper summarizer
+├── components/            # Reusable components
+│   ├── ui/               # UI components (shadcn/ui)
+│   ├── navigation.tsx    # Main navigation
+│   └── feature-layout.tsx # Layout for feature pages
+├── lib/                  # Utility functions
+└── styles/              # Global styles
+```
 
 ## Deployment
 
-Your project is live at:
+This project is ready to deploy on:
 
-**[https://vercel.com/muhammadsufiyanbaigs-projects/v0-ai-study-assistant](https://vercel.com/muhammadsufiyanbaigs-projects/v0-ai-study-assistant)**
+- **Vercel** (Recommended)
+- **Netlify**
+- **Any Node.js hosting platform**
 
-## Build your app
+### Deploy to Vercel
 
-Continue building your app on:
+```bash
+npm install -g vercel
+vercel
+```
 
-**[https://v0.app/chat/projects/3WVd6Ckc104](https://v0.app/chat/projects/3WVd6Ckc104)**
+## License
 
-## How It Works
+MIT License - feel free to use this project for learning and development.
 
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## Support
+
+For issues or questions, please open an issue on GitHub.
+
+---
+
+Built with ❤️ using Next.js and AI

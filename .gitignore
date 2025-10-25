@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/.pnp
+.pnp.js
 
 # next.js
 /.next/
@@ -16,8 +18,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
-.env*
+# local env files
+.env*.local
+.env
 
 # vercel
 .vercel
@@ -25,3 +28,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/settings.local.json
