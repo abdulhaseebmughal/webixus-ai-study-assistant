@@ -312,7 +312,7 @@ export default function FlashcardsPage() {
               }`}
               style={{
                 backfaceVisibility: "hidden",
-                transform: "rotateY(180deg)",
+                transform: "rotateY(180deg) scaleX(-1)",
               }}
             >
               <CardContent className="text-center p-8">
