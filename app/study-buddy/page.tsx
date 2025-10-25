@@ -12,7 +12,7 @@ interface Message {
   id: string
   role: "user" | "assistant"
   content: string
-  timestamp: Date
+  timestamp: Date 
 }
 
 export default function StudyBuddyPage() {
