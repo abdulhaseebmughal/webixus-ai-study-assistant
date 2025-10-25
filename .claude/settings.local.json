@@ -15,7 +15,8 @@
       "Bash(git commit:*)",
       "Bash(node test-api.js:*)",
       "Bash(rm:*)",
-      "Bash(pnpm run build:*)"
+      "Bash(pnpm run build:*)",
+      "Bash(pnpm add:*)"
     ],
     "deny": [],
     "ask": []
