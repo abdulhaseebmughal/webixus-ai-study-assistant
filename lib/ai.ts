@@ -4,7 +4,7 @@
  */
 
 const DO_API_KEY = process.env.DO_API_KEY!;
-const DO_API_ENDPOINT = "https://api.digitalocean.com/v2/ai/inference";
+const DO_API_ENDPOINT = "https://api.digitalocean.com/v2/genai/chat/completions";
 
 if (!DO_API_KEY) {
   throw new Error("Please define DO_API_KEY in .env.local");
