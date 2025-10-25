@@ -1,10 +1,10 @@
 /**
  * DigitalOcean AI Integration
- * Utilities for calling DigitalOcean AI Inference API
+ * Optimized for fast, accurate responses
  */
 
 const DO_API_KEY = process.env.DO_API_KEY!;
-const DO_API_URL = process.env.DO_API_URL || "https://api.digitalocean.com/v2/ai/inference";
+const DO_API_ENDPOINT = "https://api.digitalocean.com/v2/ai/inference";
 
 if (!DO_API_KEY) {
   throw new Error("Please define DO_API_KEY in .env.local");
@@ -17,10 +17,11 @@ export interface AIResponse {
 }
 
 /**
- * Call DigitalOcean AI for text generation
+ * Call DigitalOcean AI - Optimized for speed and accuracy
  */
 export async function callDOAI(
-  prompt: string,
+  systemPrompt: string,
+  userPrompt: string,
   options: {
     model?: string;
     maxTokens?: number;
@@ -29,23 +30,27 @@ export async function callDOAI(
 ): Promise<AIResponse> {
   const {
     model = "meta-llama/llama-3.1-70b-instruct",
-    maxTokens = 1000,
+    maxTokens = 2000,
     temperature = 0.7,
   } = options;
 
   try {
-    const response = await fetch(DO_API_URL, {
+    const response = await fetch(DO_API_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${DO_API_KEY}`,
+        "Authorization": `Bearer ${DO_API_KEY}`,
       },
       body: JSON.stringify({
         model,
         messages: [
           {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
             role: "user",
-            content: prompt,
+            content: userPrompt,
           },
         ],
         max_tokens: maxTokens,
@@ -95,31 +100,35 @@ export function extractAIText(response: any): string {
 }
 
 /**
- * Generate summary using AI
+ * SUMMARIZATION - Fast and accurate text summarization
  */
 export async function generateSummary(text: string): Promise<{
   tldr: string;
   detailed: string;
   keyPoints: string[];
 }> {
-  const prompt = `
-Analyze the following text and provide:
-1. A TL;DR (2-3 sentences)
-2. A detailed summary (1-2 paragraphs)
-3. 5 key points as a JSON array
+  const systemPrompt = `You are an expert academic summarizer. Your task is to analyze text and provide:
+1. A concise TL;DR (2-3 sentences maximum)
+2. A detailed summary (150-200 words)
+3. Exactly 5 key points (bullet points)
 
-Text:
-${text}
+Always respond in valid JSON format. Be clear, concise, and accurate.`;
 
-Respond in this exact JSON format:
+  const userPrompt = `Summarize this text:
+
+${text.substring(0, 4000)}
+
+Respond with ONLY this JSON format (no other text):
 {
-  "tldr": "...",
-  "detailed": "...",
-  "keyPoints": ["point1", "point2", "point3", "point4", "point5"]
-}
-`;
+  "tldr": "2-3 sentence summary here",
+  "detailed": "detailed 150-200 word summary here",
+  "keyPoints": ["point 1", "point 2", "point 3", "point 4", "point 5"]
+}`;
 
-  const response = await callDOAI(prompt, { maxTokens: 1500 });
+  const response = await callDOAI(systemPrompt, userPrompt, {
+    maxTokens: 1500,
+    temperature: 0.5,
+  });
 
   if (!response.success || !response.data) {
     return {
@@ -152,29 +161,39 @@ Respond in this exact JSON format:
 }
 
 /**
- * Generate quiz questions from content
+ * QUIZ GENERATION - Generate smart quiz questions
  */
 export async function generateQuiz(
   content: string,
   questionCount: number = 5
 ): Promise<any[]> {
-  const prompt = `
-Generate ${questionCount} multiple-choice quiz questions based on this content:
+  const systemPrompt = `You are an expert quiz creator. Generate high-quality multiple-choice questions that test understanding, not just memorization.
 
-${content}
+Rules:
+- Create ${questionCount} questions
+- Each question must have exactly 4 options
+- Questions should test comprehension and analysis
+- Explanations should be clear and educational
+- Always output valid JSON`;
 
-Return a JSON array of questions in this exact format:
+  const userPrompt = `Create ${questionCount} multiple-choice quiz questions from this content:
+
+${content.substring(0, 3500)}
+
+Respond with ONLY a JSON array (no other text):
 [
   {
-    "question": "Question text here?",
+    "question": "Clear, specific question?",
     "options": ["Option A", "Option B", "Option C", "Option D"],
     "correctAnswer": "Option B",
-    "explanation": "Why this is correct..."
+    "explanation": "Brief explanation of why this is correct"
   }
-]
-`;
+]`;
 
-  const response = await callDOAI(prompt, { maxTokens: 2000 });
+  const response = await callDOAI(systemPrompt, userPrompt, {
+    maxTokens: 2500,
+    temperature: 0.6,
+  });
 
   if (!response.success || !response.data) {
     return [];
@@ -194,27 +213,37 @@ Return a JSON array of questions in this exact format:
 }
 
 /**
- * Generate flashcards from content
+ * FLASHCARD GENERATION - Create effective study flashcards
  */
 export async function generateFlashcards(
   content: string,
   cardCount: number = 10
 ): Promise<any[]> {
-  const prompt = `
-Create ${cardCount} flashcards from this content:
+  const systemPrompt = `You are an expert at creating effective study flashcards. Create clear, concise flashcards that promote active recall.
 
-${content}
+Rules:
+- Front: Clear question or concept (keep it short)
+- Back: Concise answer or explanation (1-2 sentences)
+- Focus on key concepts and important facts
+- Make cards testable and specific
+- Always output valid JSON`;
 
-Return a JSON array in this exact format:
+  const userPrompt = `Create ${cardCount} study flashcards from this content:
+
+${content.substring(0, 3500)}
+
+Respond with ONLY a JSON array (no other text):
 [
   {
-    "front": "Question or concept",
-    "back": "Answer or explanation"
+    "front": "Short question or concept?",
+    "back": "Clear, concise answer (1-2 sentences)"
   }
-]
-`;
+]`;
 
-  const response = await callDOAI(prompt, { maxTokens: 2000 });
+  const response = await callDOAI(systemPrompt, userPrompt, {
+    maxTokens: 2000,
+    temperature: 0.5,
+  });
 
   if (!response.success || !response.data) {
     return [];
@@ -234,35 +263,54 @@ Return a JSON array in this exact format:
 }
 
 /**
- * Chat / Q&A with AI
+ * STUDY BUDDY CHAT - Intelligent Q&A assistant
  */
 export async function chatWithAI(question: string, context?: string): Promise<string> {
-  const prompt = context
-    ? `Context: ${context}\n\nQuestion: ${question}\n\nAnswer:`
+  const systemPrompt = `You are a helpful Study Buddy AI assistant. Your role is to:
+- Answer questions clearly and concisely
+- Explain concepts in simple terms
+- Provide examples when helpful
+- Be encouraging and supportive
+- Keep responses focused and educational
+
+Always give accurate, helpful information. If you don't know something, say so.`;
+
+  const userPrompt = context
+    ? `Context: ${context}\n\nQuestion: ${question}`
     : question;
 
-  const response = await callDOAI(prompt, { maxTokens: 1000 });
+  const response = await callDOAI(systemPrompt, userPrompt, {
+    maxTokens: 1000,
+    temperature: 0.7,
+  });
 
   if (!response.success || !response.data) {
-    return "I'm sorry, I couldn't generate a response at this time.";
+    return "I'm sorry, I couldn't generate a response at this time. Please try again.";
   }
 
   return extractAIText(response.data);
 }
 
 /**
- * Rewrite or improve text
+ * TEXT REWRITING - Improve and clarify text
  */
 export async function rewriteText(text: string, style: string = "clear"): Promise<string> {
-  const prompt = `
-Rewrite the following text to make it ${style} and easy to understand:
+  const systemPrompt = `You are an expert editor. Rewrite text to make it ${style} while preserving the original meaning and key information.
 
-${text}
+Focus on:
+- Clarity and readability
+- Proper grammar and structure
+- Maintaining factual accuracy
+- Making it easy to understand`;
 
-Improved version:
-`;
+  const userPrompt = `Rewrite this text to make it ${style}:
 
-  const response = await callDOAI(prompt, { maxTokens: 1500 });
+${text.substring(0, 2000)}`;
+
+  const response = await callDOAI(systemPrompt, userPrompt, {
+    maxTokens: 1500,
+    temperature: 0.6,
+  });
 
   if (!response.success || !response.data) {
     return text;
