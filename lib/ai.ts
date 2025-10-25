@@ -35,32 +35,41 @@ export async function callDOAI(
   } = options;
 
   try {
+    const requestBody = {
+      model,
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+      max_tokens: maxTokens,
+      temperature,
+    };
+
+    console.log("🚀 [AI REQUEST] Endpoint:", DO_API_ENDPOINT);
+    console.log("🚀 [AI REQUEST] Model:", model);
+    console.log("🚀 [AI REQUEST] Request Body:", JSON.stringify(requestBody, null, 2));
+
     const response = await fetch(DO_API_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${DO_API_KEY}`,
       },
-      body: JSON.stringify({
-        model,
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: userPrompt,
-          },
-        ],
-        max_tokens: maxTokens,
-        temperature,
-      }),
+      body: JSON.stringify(requestBody),
     });
+
+    console.log("📥 [AI RESPONSE] Status:", response.status, response.statusText);
+    console.log("📥 [AI RESPONSE] Headers:", Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("DigitalOcean AI API Error:", errorText);
+      console.error("❌ [AI ERROR] Response:", errorText);
       return {
         success: false,
         error: `AI API request failed: ${response.statusText}`,
@@ -68,6 +77,8 @@ export async function callDOAI(
     }
 
     const data = await response.json();
+    console.log("✅ [AI SUCCESS] Response Data:", JSON.stringify(data, null, 2));
+
     return {
       success: true,
       data,
@@ -125,12 +136,17 @@ Respond with ONLY this JSON format (no other text):
   "keyPoints": ["point 1", "point 2", "point 3", "point 4", "point 5"]
 }`;
 
+  console.log("📝 [SUMMARIZE] Starting summary generation...");
+
   const response = await callDOAI(systemPrompt, userPrompt, {
     maxTokens: 1500,
     temperature: 0.5,
   });
 
+  console.log("📝 [SUMMARIZE] AI Response:", response);
+
   if (!response.success || !response.data) {
+    console.error("📝 [SUMMARIZE] Failed:", response.error);
     return {
       tldr: "Error generating summary",
       detailed: "Unable to process the document at this time.",
@@ -140,9 +156,13 @@ Respond with ONLY this JSON format (no other text):
 
   try {
     const aiText = extractAIText(response.data);
+    console.log("📝 [SUMMARIZE] Extracted AI Text:", aiText);
+
     const jsonMatch = aiText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
+      console.log("📝 [SUMMARIZE] Found JSON:", jsonMatch[0]);
       const parsed = JSON.parse(jsonMatch[0]);
+      console.log("📝 [SUMMARIZE] Parsed Result:", parsed);
       return {
         tldr: parsed.tldr || "",
         detailed: parsed.detailed || "",
@@ -150,9 +170,10 @@ Respond with ONLY this JSON format (no other text):
       };
     }
   } catch (error) {
-    console.error("Error parsing AI summary:", error);
+    console.error("❌ [SUMMARIZE] Error parsing AI summary:", error);
   }
 
+  console.log("📝 [SUMMARIZE] Falling back to plain text");
   return {
     tldr: "Summary generated successfully",
     detailed: extractAIText(response.data),

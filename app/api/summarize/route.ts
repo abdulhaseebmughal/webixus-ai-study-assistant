@@ -11,10 +11,12 @@ import { generateSummary } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("🔵 [API /summarize] Request received");
     await connectDB();
 
     const body = await request.json();
     const { text, documentId } = body;
+    console.log("🔵 [API /summarize] Request body:", { textLength: text?.length, documentId });
 
     let contentToSummarize = text;
 
@@ -48,7 +50,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate summary using AI
+    console.log("🔵 [API /summarize] Calling generateSummary...");
     const summary = await generateSummary(contentToSummarize);
+    console.log("🔵 [API /summarize] Summary generated:", summary);
 
     // If documentId provided, save summary to document
     if (documentId) {
@@ -61,6 +65,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    console.log("✅ [API /summarize] Success - Returning response");
     return NextResponse.json(
       {
         success: true,
@@ -72,7 +77,8 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Summarize error:", error);
+    console.error("❌ [API /summarize] Error:", error);
+    console.error("❌ [API /summarize] Stack:", error.stack);
     return NextResponse.json(
       {
         success: false,
